@@ -12,6 +12,9 @@ from callback import QuestionGenCallbackHandler, StreamingLLMCallbackHandler
 from query_data import get_chain
 from schemas import ChatResponse
 
+from nlp import spectralCluster
+from eureka import metadataDna
+
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 vectorstore: Optional[VectorStore] = None
@@ -47,12 +50,51 @@ async def websocket_endpoint(websocket: WebSocket):
         try:
             # Receive and send back the client message
             question = await websocket.receive_text()
+
             resp = ChatResponse(sender="you", message=question, type="stream")
             await websocket.send_json(resp.dict())
 
             # Construct a response
             start_resp = ChatResponse(sender="bot", message="", type="start")
             await websocket.send_json(start_resp.dict())
+
+            meta = metadataDna(question)
+            if len(meta) == 0:
+                resp = ChatResponse(
+                    sender="bot",
+                    message="Sorry, something went wrong. Try again.",
+                    type="error",
+                )
+                await websocket.send_json(resp.dict())
+            phrases = []
+            patent_phrases = {}
+            patent_items = {}
+            for item in meta:
+                pitem = item['patent_id']
+                fitem = item['tech_field']
+                patent_items[pitem] = item
+                phrases.append(fitem)
+                if fitem not in patent_phrases:
+                    patent_phrases[fitem] = [pitem]
+                else:
+                    patent_phrases[fitem].append(pitem)
+            phrases = set(phrases)
+
+            groupPhrase = spectralCluster(phrases, 'CN')
+            for phrases_in_cluster in groupPhrase:
+                resp = ChatResponse(
+                    sender="bot",
+                    message="\n",
+                    type="error",
+                )
+                await websocket.send_json(resp.dict())
+                for phrase in phrases_in_cluster:
+                    resp = ChatResponse(
+                        sender="bot",
+                        message=f"\t {phrase}",
+                        type="error",
+                    )
+                    await websocket.send_json(resp.dict())
 
             result = await qa_chain.acall(
                 {"question": question, "chat_history": chat_history}
