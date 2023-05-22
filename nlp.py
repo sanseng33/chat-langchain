@@ -4,8 +4,6 @@ from sklearn.cluster import KMeans
 from gensim.models import Word2Vec
 import numpy as np
 
-from sentence_transformers import SentenceTransformer
-
 import jieba
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import SpectralClustering
@@ -53,16 +51,6 @@ def word2Vec(documents):
     # Convert all documents to vectors
     document_vectors = [document_to_vector(doc, model) for doc in documents]
     return document_vectors
-
-def bert(documents):
-    # Load the BERT model
-    model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-
-    # Assume that `texts` is your list of texts to cluster
-    # texts = ["The cat says meow", "The dog says woof", ...]
-
-    # Get a vector representation for each text
-    return model.encode(documents)
 
 def hierarchical(texts, lang):
     # segment words with jieba

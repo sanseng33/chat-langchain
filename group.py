@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 """Main entrypoint for the app."""
 import json
 import os
+import nltk
 
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
@@ -107,19 +108,21 @@ async def postGroup(request: Dict[str, Union[List[ChatQuery], str]]):
             type="error",
         )
         return resp.dict()
-    phrases = []
-    patent_phrases = {}
-    patent_items = {}
     text = ''
     for item in meta:
         if item.tech_title is not None and item.tech_title != '':
-            text = text + "Derived from patent " + item.pn + ":" + item.tech_title + " "
-    vectorGroup(text)
+            if lang == 'CN' or lang == 'cn':
+                text += "来源于专利" + item.pn + ": 技术领域为"+ item.tech_field+"," + item.tech_title + "."
+            else:
+                text += "Derived from patent " + item.pn + ": technical field is "+ item.tech_field+"," + item.tech_title + "."
+    return vectorGroup(text)
 
 def vectorGroup(text):
 
-    text_splitter = RecursiveCharacterTextSplitter(separators=["\n\n", "\n", "\t"], chunk_size=1000, chunk_overlap=200)
-    docs = text_splitter.create_documents([text])
+    # text_splitter = RecursiveCharacterTextSplitter(separators=["\n\n", "\n", "\t"], chunk_size=1000, chunk_overlap=200)
+    # docs = text_splitter.create_documents([text])
+    # docs = text_splitter.create_documents(text)
+    docs = vecSplit(text)
     num_documents = len(docs)
     print(f"now is split up into {num_documents}")
 
@@ -131,13 +134,38 @@ def vectorGroup(text):
     kmeans_label = kmeans.labels_
 
     closest_indices = []
-    for i in range(num_documents):
-        distances = np.linalg.norm(vectors - kmeans_label.cluster_centers_[i], axis=1)
+    for i in range(5):
+        distances = np.linalg.norm(vectors - kmeans.cluster_centers_[i], axis=1)
         closest_index = np.argmin(distances)
         closest_indices.append(closest_index)
 
     closest_indices = sorted(closest_indices)
-    print(closest_indices)
+    resultBody = []
+    for index in closest_indices:
+        resultItem = {}
+        resultItem['tech_solutions'] = docs[index].page_content
+        resultBody.append(resultItem)
+    return resultBody
+
+def vecSplit(text):
+    chunk_size = 500
+
+    return create_document_list(text, chunk_size)
+
+def split_text_into_chunks(text, chunk_size):
+    tokens = nltk.word_tokenize(text)
+    chunks = [tokens[i:i + chunk_size] for i in range(0, len(tokens), chunk_size)]
+    return chunks
+
+def create_document_list(text, chunk_size):
+    nltk.download('punkt')  # Download the 'punkt' resource
+    chunks = split_text_into_chunks(text, chunk_size)
+    document_list = []
+    for chunk in chunks:
+        page_content = " ".join(chunk)
+        document = Document(page_content=page_content)
+        document_list.append(document)
+    return document_list
 
 
 if __name__ == "__main__":
