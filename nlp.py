@@ -88,7 +88,7 @@ def hierarchical(texts, lang):
 
 def spectralCluster(texts, lang):
     # segment words with jieba
-    if lang == 'CN':
+    if lang == 'CN' or lang == 'cn':
         texts = [" ".join(jieba.cut(text)) for text in texts]
     # vectorize texts with TfidfVectorizer
     vectorizer = TfidfVectorizer()
@@ -101,7 +101,7 @@ def spectralCluster(texts, lang):
     # generate and print nested list of clusters
     clustered_texts = [[] for _ in range(5)]
     for index, label in enumerate(predict_labels):
-        if lang == 'CN':
+        if lang == 'CN' or lang == 'cn':
             clustered_texts[label].append(texts[index].replace(" ", ""))
         else:
             clustered_texts[label].append(texts[index])

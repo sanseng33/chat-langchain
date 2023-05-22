@@ -1,4 +1,5 @@
 """Main entrypoint for the app."""
+import json
 import logging
 import pickle
 from pathlib import Path
@@ -81,24 +82,36 @@ async def websocket_endpoint(websocket: WebSocket):
             phrases = set(phrases)
 
             groupPhrase = spectralCluster(phrases, 'CN')
-            for phrases_in_cluster in groupPhrase:
-                resp = ChatResponse(
-                    sender="bot",
-                    message="\n",
-                    type="error",
-                )
-                await websocket.send_json(resp.dict())
-                for phrase in phrases_in_cluster:
-                    resp = ChatResponse(
-                        sender="bot",
-                        message=f"\t {phrase}",
-                        type="error",
-                    )
-                    await websocket.send_json(resp.dict())
 
-            result = await qa_chain.acall(
-                {"question": question, "chat_history": chat_history}
-            )
+            resultBody = {}
+            for phrases_in_cluster in groupPhrase:
+                titleSpend = []
+                for phrase in phrases_in_cluster:
+                    patentIds = patent_phrases[phrase]
+                    patentIds = set(patentIds)
+                    for patentId in patentIds:
+                        if len(titleSpend) < 20:
+                            item = patent_items[patentId]
+                            techTitle = item['tech_title']
+                            titleSpend.append(techTitle)
+                            titleSpend.append(".")
+
+                message = ''.join(titleSpend)
+
+                techFields = ','.join(phrases_in_cluster)
+
+                resultBody['tech_fields'] = techFields
+                resultBody['tech_solutions'] = message
+                print(json.dumps(resultBody, ensure_ascii=False, encoding='utf-8'))
+
+                result = await qa_chain.acall(
+                    {"question": question, "chat_history": chat_history, "techFields": techFields}
+                )
+                # fieldResult= result["answer"]
+                # await qa_chain.acall(
+                #     {"question": question, "chat_history": chat_history, "techFields": fieldResult, "techSolutions": message}
+                # )
+
             chat_history.append((question, result["answer"]))
 
             end_resp = ChatResponse(sender="bot", message="", type="end")
