@@ -21,6 +21,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
+import jieba
 
 
 app = FastAPI()
@@ -30,7 +31,7 @@ templates = Jinja2Templates(directory="templates")
 class ChatQuery(BaseModel):
     patent_id: str = None
     tech_field: str = None
-    tech_means: str = None
+    efficacy: str = None
     tech_title: str = None
     pn: str = None
 
@@ -112,16 +113,14 @@ async def postGroup(request: Dict[str, Union[List[ChatQuery], str]]):
     for item in meta:
         if item.tech_title is not None and item.tech_title != '':
             if lang == 'CN' or lang == 'cn':
-                text += "来源于专利" + item.pn + ": 技术领域为"+ item.tech_field+"," + item.tech_title + "."
+                text += "来源于专利" + item.pn + ": 技术领域为"+ item.tech_field+"," + item.tech_title + "." + "达到效果:"+item.efficacy + "."
             else:
-                text += "Derived from patent " + item.pn + ": technical field is "+ item.tech_field+"," + item.tech_title + "."
-    return vectorGroup(text)
+                text += "Derived from patent " + item.pn + ": technical field is "+ item.tech_field+"," + item.tech_title + "." + "achieve effect:"+item.efficacy + "."
+    return vectorGroup(text, lang)
 
-def vectorGroup(text):
-
-    # text_splitter = RecursiveCharacterTextSplitter(separators=["\n\n", "\n", "\t"], chunk_size=1000, chunk_overlap=200)
-    # docs = text_splitter.create_documents([text])
-    # docs = text_splitter.create_documents(text)
+def vectorGroup(text, lang):
+    if lang == "cn" or lang == "CN":
+        text = " ".join(jieba.cut(text))
     docs = vecSplit(text)
     num_documents = len(docs)
     print(f"now is split up into {num_documents}")
@@ -129,12 +128,12 @@ def vectorGroup(text):
     embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
     vectors = embeddings.embed_documents([x.page_content for x in docs])
 
-    kmeans = KMeans(n_clusters=5, random_state=42).fit(vectors)
-
-    kmeans_label = kmeans.labels_
+    clusters = min(num_documents, 5)
+    kmeans = KMeans(n_clusters=clusters, random_state=42).fit(vectors)
+    kmeansl = kmeans.labels_
 
     closest_indices = []
-    for i in range(5):
+    for i in range(clusters):
         distances = np.linalg.norm(vectors - kmeans.cluster_centers_[i], axis=1)
         closest_index = np.argmin(distances)
         closest_indices.append(closest_index)
@@ -143,7 +142,10 @@ def vectorGroup(text):
     resultBody = []
     for index in closest_indices:
         resultItem = {}
-        resultItem['tech_solutions'] = docs[index].page_content
+        page = docs[index].page_content
+        if lang == "cn" or lang == "CN":
+            page.replace(" ", "")
+        resultItem['tech_solutions'] = page
         resultBody.append(resultItem)
     return resultBody
 
