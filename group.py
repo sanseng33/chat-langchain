@@ -150,7 +150,7 @@ def vectorGroup(text, lang):
     return resultBody
 
 def vecSplit(text):
-    chunk_size = 500
+    chunk_size = 400
 
     return create_document_list(text, chunk_size)
 
