@@ -16,10 +16,7 @@ from schemas import ChatResponse
 from typing import List, Dict, Union
 
 from langchain.schema import Document
-from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains.summarize import load_summarize_chain
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import jieba
 
