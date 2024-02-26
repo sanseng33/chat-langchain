@@ -23,7 +23,7 @@ def set_openai_api_key(api_key, agent):
         os.environ["OPENAI_API_KEY"] = api_key
         vectorstore = get_weaviate_store()
         qa_chain = get_new_chain1(vectorstore)
-        os.environ["OPENAI_API_KEY"] = "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"
+        os.environ["OPENAI_API_KEY"] = "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"
         return qa_chain
 
 

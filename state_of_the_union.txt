@@ -1,0 +1,38 @@
+1. Feature: New Materials Platform
+   Description: The new materials platform focuses on metals, ceramics, and polymers. This feature could be beneficial for those interested in the catalyst side of things.
+
+2. Feature: Large Patent Database
+   Description: The platform has a database of over 182,000,000 patents. This extensive coverage is crucial for Freedom to Operate (FTO) reasons to avoid potential patent infringement.
+
+3. Feature: Comprehensive Translations
+   Description: The platform offers comprehensive translations, including full coverage of China, Japan, South Korea. It uses an enhanced Google translate system that is proficient at translating technical terms. When users search keywords in English, the system searches them in Chinese, Japanese, and returns the results in English.
+
+4. Feature: Legal Status
+   Description: The platform provides the legal status of patents, aiming to be as accurate as possible. It also includes information on litigation and licensing deals.
+
+5. Feature: Customizable Search
+   Description: Users have full control over how they want to search. They can use keywords to conduct a search and refine the results according to their needs.
+
+. Feature: Exclude Keywords
+   Description: This feature allows users to exclude certain keywords from their search to refine the results.
+   Operation: Simply input the keyword you wish to exclude from the search.
+
+2. Feature: Semantic Search
+   Description: This feature uses natural language processing to find relevant patents based on a description or a specific patent number.
+   Operation: Input a description or patent number into the search bar and the system will find similar patents.
+
+3. Feature: Patent Classification Search
+   Description: This feature allows users to search patents based on their classification system, similar to a library code.
+   Operation: Input the specific classification into the search bar to find all patents within that classification.
+
+4. Feature: Patent Family View
+   Description: This feature provides an overview of the scope of a patent family, showing where it is active or inactive.
+   Operation: Look at the Patent family view for a quick glance at the patent's activity status and location.
+
+5. Feature: Keyword Highlighting
+   Description: This feature highlights the keywords in a patent document that match your search.
+   Operation: If there is a green bar in the patent document, it means that the searched keywords are mentioned in that patent.
+
+6. Feature: Patent Summary
+   Description: This feature uses GPT technologies to summarize the patent, outlining the problem it solves and its benefits.
+   Operation: The system automatically provides a summary for each patent, so users don't have to read the whole document.
