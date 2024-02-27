@@ -1,16 +1,17 @@
 import os
-os.environ["OPENAI_API_KEY"] = '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'
+
+os.environ["OPENAI_API_KEY"] = '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'
 
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import Docx2txtLoader
 from langchain.document_loaders import TextLoader
 
-base_dir='.\doc'
-documents=[]
+base_dir = '.\doc'
+documents = []
 
 for file in os.listdir(base_dir):
     filepath = os.path.join(base_dir, file)
-    if(file.endswith('.pdf')):
+    if (file.endswith('.pdf')):
         loader = PyPDFLoader(filepath)
         documents.extend(loader.load())
     elif file.endswith('.docx'):
@@ -22,23 +23,34 @@ for file in os.listdir(base_dir):
 
 # 2.Split 将Documents切分成块以便后续进行嵌入和向量存储
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=10)
+from langchain.text_splitter import CharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=0)
+# text_splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=0)
 chunked_documents = text_splitter.split_documents(documents)
 
 # 3.Store 将分割嵌入并存储在矢量数据库Qdrant中
 from langchain.vectorstores import Qdrant
+from langchain.vectorstores import Milvus
 from langchain.embeddings import OpenAIEmbeddings
+
 vectorstore = Qdrant.from_documents(
     documents=chunked_documents, # 以分块的文档
     embedding=OpenAIEmbeddings(), # 用OpenAI的Embedding Model做嵌入
-    location=":memory:",  # in-memory 存储
-    collection_name="my_documents",) # 指定collection_name
+    location="106.14.106.79:6333",  # in-memory 存储
+    collection_name="langchain_doc",) # 指定collection_name
+# vectorstore = Milvus.from_documents(
+#     chunked_documents,
+#     embedding=OpenAIEmbeddings(),
+#     collection_name="local_doc",
+#     connection_args={"host": "106.14.106.79", "port": "19530"}
+# )
 
 # 4. Retrieval 准备模型和Retrieval链
-import logging # 导入Logging工具
-from langchain.chat_models import ChatOpenAI # ChatOpenAI模型
-from langchain.retrievers.multi_query import MultiQueryRetriever # MultiQueryRetriever工具
-from langchain.chains import RetrievalQA # RetrievalQA链
+import logging  # 导入Logging工具
+from langchain.chat_models import ChatOpenAI  # ChatOpenAI模型
+from langchain.retrievers.multi_query import MultiQueryRetriever  # MultiQueryRetriever工具
+from langchain.chains import RetrievalQA  # RetrievalQA链
 
 # 设置Logging
 logging.basicConfig()
@@ -51,7 +63,7 @@ llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 retriever_from_llm = MultiQueryRetriever.from_llm(retriever=vectorstore.as_retriever(), llm=llm)
 
 # 实例化一个RetrievalQA链
-qa_chain = RetrievalQA.from_chain_type(llm,retriever=retriever_from_llm)
+qa_chain = RetrievalQA.from_chain_type(llm, retriever=retriever_from_llm)
 
 # 5. Output 问答系统的UI实现
 from flask import Flask, request, render_template
