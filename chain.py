@@ -180,34 +180,9 @@ def routerChain():
     print(destinations_str)
 
     #定义模型选择模板
-    MULTI_PROMPT_ROUTER_TEMPLATE = """给定一个原始文本输入到语言模型选择最适合输入的模型提示。
-    您将获得可用提示符的名称和一个描述提示符最适合做什么。
-    你也可以修改原始输入，如果你认为修改它最终会从语言模型中得到更好的响应。
+    from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMPLATE as RounterTemplate
 
-    << FORMATTING >>
-    返回一个带有JSON对象的标记代码片段，格式如下::
-    ```json
-    {{{{
-        "destination": string \ 要使用的提示符名称或“DEFAULT”
-        "next_inputs": string \ 原始输入的潜在修改版本
-    }}}}
-    ```
-
-    REMEMBER: "destination"必须是候选提示符之一
-    如果输入不是，则可以为“DEFAULT”
-    非常适合任何候选人的提示。
-    记住:“next_inputs”可以只是原始输入
-    如果您认为不需要任何修改。
-
-    << CANDIDATE PROMPTS >>
-    {destinations}
-
-    << INPUT >>
-    {{input}}
-
-    << OUTPUT (注意要包含json)>>"""
-
-    router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(
+    router_template = RounterTemplate.format(
         destinations=destinations_str
     )
     router_prompt = PromptTemplate(
