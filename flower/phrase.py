@@ -2,7 +2,7 @@
 # 设置OpenAI API密钥
 import os
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = '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'
 
 # 创建模型实例
 from langchain import OpenAI
@@ -18,6 +18,7 @@ df = pd.DataFrame(columns=["flower_type", "price", "description", "reason"])
 # 数据准备
 flowers = ["玫瑰", "百合", "康乃馨"]
 prices = ["50", "30", "20"]
+
 
 # 定义我们想要接收的数据格式
 from pydantic import BaseModel, Field
