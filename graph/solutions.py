@@ -1,11 +1,12 @@
 from langchain.chains import LLMChain
+from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from pydantic.v1 import BaseModel, Field
 import os
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = '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'
 
-model = LLMChain(model_name='gpt-4')
+llm = ChatOpenAI(temperature=0.9, model_name='gpt-4')
 
 # demo
 # 请扮演一个研发专家，帮我一起解决问题
@@ -15,7 +16,7 @@ model = LLMChain(model_name='gpt-4')
 # 2. 噪音控制是减震设计
 # 3. 烘干能力是均匀烘干
 # 请基于这些信息，并利用你知道的研发创新理论知识，给我 5 个方案并预测这些方案能达到的性能指标，并同时告诉我这 5 个方案是否有已有的具体应用案例，比如用在哪些现有的产品上的，具体到是哪家公司的哪个产品。
-template = '现在需要设计{topic}\n以下是一些设计要求信息：{infos}\n请基于这些信息，并利用你知道的研发创新理论知识，给我 5 个方案并预测这些方案能达到的性能指标，并同时告诉我这 5 个方案是否有已有的具体应用案例，比如用在哪些现有的产品上的，具体到是哪家公司的哪个产品。{format_instructions}'
+template = '现在需要设计{topic}\n以下是一些设计要求信息：{infos}\n请基于这些信息，并利用你知道的研发创新理论知识，给我 5 个方案并预测这些方案能达到的性能指标，并同时告诉我这 5 个方案是否有已有的具体应用案例，比如用在哪些现有的产品上的，具体到是哪家公司的哪个产品。\n{format_instructions}'
 
 
 class Solution(BaseModel):
@@ -35,6 +36,7 @@ prompt = PromptTemplate.from_template(
     input_args=['topic', 'infos'],
     partial_variables={"format_instructions": output_parser.get_format_instructions()})
 
-pv = prompt.format(topic='烘干机', infos='1. 能效要求是节能、环保\n2. 噪音控制是减震设计\n3. 烘干能力是均匀烘干')
 
-print(model.run(pv))
+model = LLMChain(llm=llm, prompt=prompt, verbose=True)
+
+print(model.run(topic='烘干机', infos='1. 能效要求是节能、环保\n2. 噪音控制是减震设计\n3. 烘干能力是均匀烘干'))
