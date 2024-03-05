@@ -63,7 +63,6 @@ llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 if __name__ == "__main__":
 
     print(fewPrompt.format(flower_type="黑玫瑰", occasion="忠贞"))
-    st = SystemMessagePromptTemplate.from_template("你是一个专业的销售员")
     ht = HumanMessagePromptTemplate.from_template("{flower_type}的宣传文案是？")
     prompt_template = ChatPromptTemplate.from_messages([st, fewPrompt.format(flower_type="黑玫瑰", occasion="忠贞"), ht])
     pt = prompt_template.format_prompt(flower_type="黑玫瑰").to_messages()

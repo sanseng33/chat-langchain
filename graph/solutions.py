@@ -1,10 +1,16 @@
+import json
+from typing import List, Dict
+
 from langchain.chains import LLMChain
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from pydantic.v1 import BaseModel, Field
 import os
 
-os.environ["OPENAI_API_KEY"] = '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'
+from graph.info_add import infoAdd
+from graph.intent import textFix
+
+os.environ["OPENAI_API_KEY"] = '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'
 
 llm = ChatOpenAI(temperature=0.9, model_name='gpt-4')
 
@@ -36,7 +42,26 @@ prompt = PromptTemplate.from_template(
     input_args=['topic', 'infos'],
     partial_variables={"format_instructions": output_parser.get_format_instructions()})
 
-
 model = LLMChain(llm=llm, prompt=prompt, verbose=True)
 
-print(model.run(topic='烘干机', infos='1. 能效要求是节能、环保\n2. 噪音控制是减震设计\n3. 烘干能力是均匀烘干'))
+
+def getSolution(topic: str, infos: dict) -> Solution:
+    result = ";".join([f"{key}:{value}" for key, value in infos.items()])
+
+    return model.run(topic=topic, infos=result)
+
+
+if __name__ == "__main__":
+    question = "树脂材料容易因为高温环境损坏，如何解决"
+    resp = textFix(question)
+    print(resp)
+    jstr = json.loads(resp)
+    word = jstr["extension"][0]
+
+    infos = infoAdd(word)
+    print(infos)
+
+    infoStr = json.loads(infos)
+    converted_dict = {key: value[0] for key, value in infoStr.items()}
+    print(getSolution(word, converted_dict))
+
