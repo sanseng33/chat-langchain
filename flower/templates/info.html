@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Tech Startup</title>
+    <script>
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const inputData = document.getElementById('input-question').value;
+            // Replace YOUR_API_ENDPOINT_HERE with your actual API endpoint
+            const response = await fetch('/info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: inputData }),
+            });
+
+            if (!response.ok) {
+                alert('Error fetching data');
+                return;
+            }
+
+            const data = await response.json();
+            const extensionContainer = document.getElementById('extension-container');
+            extensionContainer.innerHTML = ''; // Clear existing buttons if any
+
+            data.extension.forEach(item => {
+                const button = document.createElement('button');
+                button.textContent = item;
+                button.onclick = () => alert(item); // Replace this with the actual function you want to execute on click
+                extensionContainer.appendChild(button);
+            });
+        }
+    </script>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>TechWave</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#" role="button">Contact</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <form onsubmit="handleSubmit(event)">
+            <input type="text" id="input-question" name="question" placeholder="Enter your question" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="extension-container"></div>
+        <!-- Existing content below -->
+        <div class="grid">
+            <section>
+                <!-- Your existing HTML content here -->
+            </section>
+        </div>
+    </main>
+    <!-- Footer and other content -->
+</body>
+</html>

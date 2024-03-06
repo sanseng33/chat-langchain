@@ -27,7 +27,7 @@ def simpleChain():
 def simpleSequentialChain():
     llm = ChatOpenAI(temperature=0.9, model_name='gpt-4')
 
-    # prompt template 1
+    # prompt templates 1
     first_prompt = ChatPromptTemplate.from_template(
         "What is the best name to describe \
         a company that does {product}?"
@@ -36,7 +36,7 @@ def simpleSequentialChain():
     # Chain 1
     chain_one = LLMChain(llm=llm, prompt=first_prompt)
 
-    # prompt template 2
+    # prompt templates 2
     second_prompt = ChatPromptTemplate.from_template(
         "Write a 20 words description for the following \
         company:{company_name}"
@@ -54,7 +54,7 @@ def simpleSequentialChain():
 def sequentialChain():
     llm = ChatOpenAI(temperature=0.9)
 
-    # prompt template 1: translate to english
+    # prompt templates 1: translate to english
     first_prompt = ChatPromptTemplate.from_template(
         "Translate the following solution to english:"
         "\n\n{Solution}"
@@ -64,7 +64,7 @@ def sequentialChain():
                          output_key="English_Solution"
                          )
 
-    # prompt template 2
+    # prompt templates 2
     second_prompt = ChatPromptTemplate.from_template(
         "Can you summarize the following solution in 1 sentence:"
         "\n\n{English_Solution}"
@@ -74,7 +74,7 @@ def sequentialChain():
                          output_key="summary"
                          )
 
-    # prompt template 3: translate to english
+    # prompt templates 3: translate to english
     third_prompt = ChatPromptTemplate.from_template(
         "What language is the following solution:\n\n{Solution}"
     )
@@ -83,7 +83,7 @@ def sequentialChain():
                            output_key="language"
                            )
 
-    # prompt template 4: follow up message
+    # prompt templates 4: follow up message
     fourth_prompt = ChatPromptTemplate.from_template(
         "Write a follow up response to the following "
         "summary in the specified language:"

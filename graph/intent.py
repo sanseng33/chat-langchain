@@ -4,7 +4,7 @@ from langchain.chains import LLMChain
 from langchain_community.chat_models import ChatOpenAI
 from pydantic.v1 import BaseModel, Field
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = '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'
 
 samples = """[
     {{

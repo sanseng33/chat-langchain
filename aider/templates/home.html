@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Tech Startup</title>
+     <style>
+        .review-container {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+        }
+        .review-container:last-child {
+            border-bottom: none;
+        }
+        .file-name {
+            font-weight: bold;
+        }
+        .review-comment {
+            font-size: 16px;
+            margin-left: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+    <script>
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const submitButton = document.getElementById('submit-button');
+            const loader = document.createElement('div');
+            loader.className = 'loader';
+            submitButton.disabled = true;
+            submitButton.textContent = '';
+            submitButton.appendChild(loader);
+            const inputData = document.getElementById('input-question').value;
+            // Replace YOUR_API_ENDPOINT_HERE with your actual API endpoint
+            const response = await fetch('http://127.0.0.1:5000/code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: inputData }),
+            });
+            submitButton.removeChild(loader);
+            submitButton.textContent = 'Submit';
+            submitButton.disabled = false;
+
+            if (!response.ok) {
+                alert('Error fetching data');
+                return;
+            }
+
+            const data = await response.json();
+            const extensionContainer = document.getElementById('extension-container');
+            extensionContainer.innerHTML = ''; // Clear existing content if any
+
+           data.forEach(item => {
+                const reviewContainer = document.createElement('div');
+                reviewContainer.classList.add('review-container');
+
+                const fileName = document.createElement('div');
+                fileName.classList.add('file-name');
+                fileName.textContent = item.file;
+                reviewContainer.appendChild(fileName);
+
+                const reviews = item.review;
+                reviews.forEach(review => {
+                    const reviewComment = document.createElement('div');
+                    reviewComment.classList.add('review-comment');
+                    reviewComment.textContent = `Line ${review.lineNumber}: ${review.reviewComment}`;
+                    reviewContainer.appendChild(reviewComment);
+                });
+
+                extensionContainer.appendChild(reviewContainer);
+            });
+        }
+    </script>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>Code Review</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Home</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <form onsubmit="handleSubmit(event)">
+            <input type="text" id="input-question" name="question" placeholder="输入你的git提交记录id" required>
+            <button type="submit" id="submit-button">分析</button>
+        </form>
+        <div id="extension-container"></div>
+        <!-- Existing content below -->
+        <div class="grid">
+            <section>
+                <!-- Your existing HTML content here -->
+            </section>
+        </div>
+    </main>
+    <!-- Footer and other content -->
+</body>
+</html>
