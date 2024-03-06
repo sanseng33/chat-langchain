@@ -67,7 +67,7 @@ def commit_diff(project_id: str, commit_sha: str) -> str:
 def commit_all(project_id: str) -> str:
     # 构建API URL
     # url = f"{BASE_URL}/projects/{PROJECT_ID}/repository/commits/{COMMIT_SHA}/diff?unidiff=true"
-    url = f"{BASE_URL}/projects/{project_id}/repository/commits?ref_name=master&since=2024-03-01T00:00:00&first_parent=true"
+    url = f"{BASE_URL}/projects/{project_id}/repository/commits?ref_name=master&since=2024-03-01T00:00:00&first_parent=false"
 
     # 发送GET请求获取提交详情
     headers = {'PRIVATE-TOKEN': f'{ACCESS_TOKEN}'}
@@ -78,7 +78,7 @@ def commit_all(project_id: str) -> str:
         print("提交列表：")
         print(commit_info)
         resp = []
-        for item in commit_info.items():
+        for item in commit_info:
             result = {'short_id': item['short_id'], 'title': item['title']}
             resp.append(result)
         return json.dumps(resp)

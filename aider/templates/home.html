@@ -40,21 +40,75 @@
 
         async function fetchDropdownData() {
             // Replace YOUR_INFO_API_ENDPOINT_HERE with your actual info API endpoint
-            const response = await fetch('YOUR_INFO_API_ENDPOINT_HERE');
+            const response = await fetch('http://127.0.0.1:5000/commits');
             if (!response.ok) {
                 alert('Error fetching dropdown data');
                 return;
             }
 
-            const data = await response.json();
+            const resp = await response.json();
             const select = document.getElementById('input-question');
 
-            data.forEach(item => {
+            resp.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.short_id;
                 option.textContent = item.title;
                 select.appendChild(option);
             });
+        }
+
+        async function handleParse(inputData, data) {
+            const response = await fetch('http://127.0.0.1:5000/code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: inputData, continuation_data:data }),
+            });
+
+
+            if (!response.ok) {
+                alert('Error fetching data');
+                return;
+            }
+
+            if (data == null) {
+                const submitButton = document.getElementById('submit-button');
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                submitButton.disabled = true;
+                submitButton.textContent = '';
+                submitButton.appendChild(loader);
+            }
+
+            const exStatus = document.getElementById('extension-status');
+            exStatus.disabled = true;
+            exStatus.textContent = '';
+
+            const resp = await response.json();
+            const extensionContainer = document.getElementById('extension-container');
+            extensionContainer.innerHTML = ''; // Clear existing content if any
+
+            const item = resp.data;
+            const reviewContainer = document.createElement('div');
+            reviewContainer.classList.add('review-container');
+
+            const fileName = document.createElement('div');
+            fileName.classList.add('file-name');
+            fileName.textContent = item.file;
+            reviewContainer.appendChild(fileName);
+
+            const reviews = item.review;
+            reviews.forEach(review => {
+                 const reviewComment = document.createElement('div');
+                 reviewComment.classList.add('review-comment');
+                 reviewComment.textContent = `Line ${review.lineNumber}: ${review.reviewComment}`;
+                 reviewContainer.appendChild(reviewComment);
+            });
+
+            extensionContainer.appendChild(reviewContainer);
+
+            return resp.continuation_data
         }
 
         async function handleSubmit(event) {
@@ -66,46 +120,20 @@
             submitButton.textContent = '';
             submitButton.appendChild(loader);
             const inputData = document.getElementById('input-question').value;
-            // Replace YOUR_API_ENDPOINT_HERE with your actual API endpoint
-            const response = await fetch('http://127.0.0.1:5000/code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ question: inputData }),
-            });
-            submitButton.removeChild(loader);
-            submitButton.textContent = 'Submit';
-            submitButton.disabled = false;
 
-            if (!response.ok) {
-                alert('Error fetching data');
-                return;
+            async function recursiveHandleParse(data) {
+                const continue_data = await handleParse(inputData, data);
+                if (continue_data != null) {
+                    await recursiveHandleParse(continue_data);
+                } else {
+                    submitButton.removeChild(submitButton.firstChild); // Remove loader
+                    submitButton.textContent = 'Submit';
+                    submitButton.disabled = false;
+                }
             }
-
-            const data = await response.json();
-            const extensionContainer = document.getElementById('extension-container');
-            extensionContainer.innerHTML = ''; // Clear existing content if any
-
-           data.forEach(item => {
-                const reviewContainer = document.createElement('div');
-                reviewContainer.classList.add('review-container');
-
-                const fileName = document.createElement('div');
-                fileName.classList.add('file-name');
-                fileName.textContent = item.file;
-                reviewContainer.appendChild(fileName);
-
-                const reviews = item.review;
-                reviews.forEach(review => {
-                    const reviewComment = document.createElement('div');
-                    reviewComment.classList.add('review-comment');
-                    reviewComment.textContent = `Line ${review.lineNumber}: ${review.reviewComment}`;
-                    reviewContainer.appendChild(reviewComment);
-                });
-
-                extensionContainer.appendChild(reviewContainer);
-            });
+            const exStatus = document.getElementById('extension-status');
+            exStatus.textContent = '代码分析中...';
+            await recursiveHandleParse(null);
         }
     </script>
 </head>
@@ -120,9 +148,14 @@
     </nav>
     <main class="container">
         <form onsubmit="handleSubmit(event)">
-            <input type="text" id="input-question" name="question" placeholder="输入你的git提交记录id" required>
+<!--            <input type="text" id="input-question" name="question" placeholder="输入你的git提交记录id" required>-->
+            <select id="input-question" name="question" required>
+                <option value="">选择一个git提交记录</option>
+                <!-- Options will be added here dynamically -->
+            </select>
             <button type="submit" id="submit-button">分析</button>
         </form>
+        <p id="extension-status"></p>
         <div id="extension-container"></div>
         <!-- Existing content below -->
         <div class="grid">
