@@ -66,7 +66,7 @@ prompt = HumanMessagePromptTemplate.from_template(
 
 def parseCode(file_name: str, file_content: str) -> str:
 
-    model = ChatOpenAI(model_name='gpt-3.5-turbo', openai_api_key='sk-aKOQOwzWZvFgX6DM3dEcF5B9712f4dC3Ad613361D3107cF9',openai_api_base='https://patgpt.minws.com/v1')
+    model = ChatOpenAI(model_name='gpt-4', openai_api_key='sk-aKOQOwzWZvFgX6DM3dEcF5B9712f4dC3Ad613361D3107cF9',openai_api_base='https://patgpt.minws.com/v1')
     chat_prompt = ChatPromptTemplate.from_messages(
         [system_message_prompt, example_human, example_ai, prompt]
     )

@@ -10,7 +10,7 @@ COMMIT_SHA = 'dfe5e3ed763b53644290c040ed53ba85c31f4e09'  # 您的提交ID（SHA�
 ACCESS_TOKEN = 'M8oe7aMuVGvyKPX1uaNH'  # 您的个人访问令牌
 
 
-def commit_short_id(project_id:str, commit_sha:str) ->str:
+def commit_short_id(project_id: str, commit_sha: str) -> str:
     # 构建API URL
     # url = f"{BASE_URL}/projects/{PROJECT_ID}/repository/commits/{COMMIT_SHA}/diff?unidiff=true"
     url = f"{BASE_URL}/projects/{project_id}/repository/commits/{commit_sha}"
@@ -29,7 +29,7 @@ def commit_short_id(project_id:str, commit_sha:str) ->str:
         return "0"
 
 
-def commit_diff(project_id:str, commit_sha:str) ->str:
+def commit_diff(project_id: str, commit_sha: str) -> str:
     # 构建API URL
     url = f"{BASE_URL}/projects/{project_id}/repository/commits/{commit_sha}/diff?unidiff=true"
     # 发送GET请求获取提交详情
@@ -62,6 +62,30 @@ def commit_diff(project_id:str, commit_sha:str) ->str:
     else:
         print("获取提交差异内容失败，状态码：", response.status_code)
         return "0"
+
+
+def commit_all(project_id: str) -> str:
+    # 构建API URL
+    # url = f"{BASE_URL}/projects/{PROJECT_ID}/repository/commits/{COMMIT_SHA}/diff?unidiff=true"
+    url = f"{BASE_URL}/projects/{project_id}/repository/commits?ref_name=master&since=2024-03-01T00:00:00&first_parent=true"
+
+    # 发送GET请求获取提交详情
+    headers = {'PRIVATE-TOKEN': f'{ACCESS_TOKEN}'}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        commit_info = response.json()
+        print("提交列表：")
+        print(commit_info)
+        resp = []
+        for item in commit_info.items():
+            result = {'short_id': item['short_id'], 'title': item['title']}
+            resp.append(result)
+        return json.dumps(resp)
+    else:
+        print("获取提交列表失败，状态码：", response.status_code)
+        return "0"
+
 
 if __name__ == "__main__":
     commit_diff(PROJECT_ID, COMMIT_SHA)

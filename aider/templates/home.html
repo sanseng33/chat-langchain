@@ -34,6 +34,29 @@
         }
     </style>
     <script>
+     document.addEventListener('DOMContentLoaded', function() {
+            fetchDropdownData();
+        });
+
+        async function fetchDropdownData() {
+            // Replace YOUR_INFO_API_ENDPOINT_HERE with your actual info API endpoint
+            const response = await fetch('YOUR_INFO_API_ENDPOINT_HERE');
+            if (!response.ok) {
+                alert('Error fetching dropdown data');
+                return;
+            }
+
+            const data = await response.json();
+            const select = document.getElementById('input-question');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.short_id;
+                option.textContent = item.title;
+                select.appendChild(option);
+            });
+        }
+
         async function handleSubmit(event) {
             event.preventDefault();
             const submitButton = document.getElementById('submit-button');
