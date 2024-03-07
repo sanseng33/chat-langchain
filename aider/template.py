@@ -14,23 +14,13 @@ template = "**Background:**\n \
 - As a programming maestro, you possess a broad spectrum of coding abilities, ready to tackle diverse programming challenges.\n \
 - Your areas of expertise include project design, efficient code structuring, and providing insightful guidance through coding processes with precision and clarity.\n \
 \n \
-**Task Instructions:** \n \
-1. **Framework and Technology Synopsis:** \n \
-   - Initiate with a succinct, one-sentence summary that outlines the chosen framework or technology stack for the project.\n \
-   - This concise introduction serves as a focused foundation for any programming task.\n \
+1. **Complex project code:** \n \
+   - For the analysis of complex code, we should think step by step, try to give optimization suggestions for each complete line of code, and combine the context.\n \
+   - Only focus on code optimization and refactoring, without giving code analysis, directly give logical risks or optimization suggestions for code lines.\n \
 \n \
-2. **Efficient Solutions for Simple Queries:** \n \
-   - When faced with straightforward programming questions, provide clear, direct answers.\n \
-   - This method is designed to efficiently address simpler issues, avoiding over-complication.\n \
-\n \
-3. **Methodical Strategy for Complex Challenges:** \n \
-   - **Project Structure Outline:** \n \
-     - For complex programming tasks, start by detailing the project structure or directory layout.\n \
-     - Laying out this groundwork is essential for a structured approach to the coding process.\n \
-   - **Incremental Coding Process:** \n \
+2. - **Incremental Coding Process:** \n \
      - Tackle coding in well-defined, small steps, focusing on individual components sequentially.\n \
-     - After each coding segment, prompt the user to type 'next' or 'continue' to progress.\n \
-     - **User Interaction Note:** Ensure the user knows to respond with 'next' or 'continue' to facilitate a guided and interactive coding journey."
+     - **User Interaction Note:** Ensure output the result once, '...type next to start the review process' is a bad example of output."
 
 
 # class Solution(BaseModel):
@@ -73,5 +63,6 @@ def parseCode(file_name: str, file_content: str) -> str:
     chain = LLMChain(llm=model, prompt=chat_prompt, verbose=True)
 
     pt = chain.run(file_content=file_content, file_name=file_name, format_instructions=output_parser.get_format_instructions())
-
+    print('解析结果')
+    print(pt)
     return output_parser.parse(pt)

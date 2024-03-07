@@ -38,7 +38,7 @@ vectorstore = Qdrant.from_documents(
     documents=chunked_documents, # 以分块的文档
     embedding=OpenAIEmbeddings(), # 用OpenAI的Embedding Model做嵌入
     location="106.14.106.79:6333",  # in-memory 存储
-    collection_name="langchain_doc",) # 指定collection_name
+    collection_name="langchain_doc") # 指定collection_name
 # vectorstore = Milvus.from_documents(
 #     chunked_documents,
 #     embedding=OpenAIEmbeddings(),
