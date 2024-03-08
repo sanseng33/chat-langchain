@@ -29,3 +29,22 @@ def file_content(project_id: str, commit_id: str, file_path: str) -> str:
         return base64.b64decode(commit_info['content']).decode()
     else:
         print("获取文件详情失败，状态码：", response.status_code)
+
+
+def file_content_with_master(project_id: str, file_path: str) -> str:
+    if isinstance(file_path, str):
+        file_path = quote_plus(file_path)
+    # 构建API URL
+    url = f"{BASE_URL}/projects/{project_id}/repository/files/{file_path}?ref=master"
+
+    # 发送GET请求获取提交详情
+    headers = {'PRIVATE-TOKEN': f'{ACCESS_TOKEN}'}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        commit_info = response.json()
+        print("文件详情：")
+        print(commit_info)
+        return base64.b64decode(commit_info['content']).decode()
+    else:
+        print("获取文件详情失败，状态码：", response.status_code)
