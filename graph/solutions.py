@@ -10,7 +10,7 @@ import os
 from graph.info_add import infoAdd
 from graph.intent import textFix
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = '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'
 
 llm = ChatOpenAI(temperature=0.9, model_name='gpt-4')
 

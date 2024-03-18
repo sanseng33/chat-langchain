@@ -8,7 +8,7 @@ from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessageProm
 
 from graph.info_add_parser import InfoListOutputParser
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = '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'
 
 model = ChatOpenAI(model_name='gpt-4')
 
@@ -39,4 +39,4 @@ def infoAdd(topic: str) -> str:
 
 
 if __name__ == "__main__":
-    print(infoAdd('烘干机'))
+    print(infoAdd('提高锂电池能量密度'))
