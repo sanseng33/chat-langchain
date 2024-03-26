@@ -6,11 +6,12 @@ from typing import Any
 import re
 
 CUSTOM_CODE_BLOCK_INSTRUCTIONS = """The output should be formatted as a JSON instance. \n \
-As an example, for the output` line number 57:Consider using Optional to handle potential null values instead of checking for nullity explicitly;line number 64:Consider using StringUtils.isEmpty() for checking both nullity and emptiness of a string`, \
-the json [{\"lineNumber\": 57, \"reviewComment\": \"Consider using Optional to handle potential null values instead of checking for nullity explicitly\"},{\"lineNumber\": 64, \"reviewComment\": \"Consider using StringUtils.isEmpty() for checking both nullity and emptiness of a string\"}} is a well-formatted instance of the output.\n  \
-Here is the output:\n   \
+As an example, for the output` lines 38-45:Consider using Optional to handle potential null values instead of checking for nullity explicitly;lines 76-80:Consider using StringUtils.isEmpty() for checking both nullity and emptiness of a string`, \
+the json [{\"lineNumber\": \"38-45\", \"reviewComment\": \"Consider using Optional to handle potential null values instead of checking for nullity explicitly\"},{\"lineNumber\": \"76-80\", \"reviewComment\": \"Consider using StringUtils.isEmpty() for checking both nullity and emptiness of a string\"}} is a well-formatted instance of the output.\n  \
+Finally, the value of reviewComment in json is output in Chinese.
+give the output:\n   \
 ```\n  \
-(review result)\n  \
+(review result should include json)\n  \
 ```"""
 
 

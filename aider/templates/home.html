@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-    <title>Tech Startup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+    <title>Tech review</title>
      <style>
         .review-container {
             margin-bottom: 20px;
@@ -19,6 +19,12 @@
         .review-comment {
             font-size: 16px;
             margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        .separator {
+            height: 2px;
+            background-color: #ccc;
+            margin: 20px 0;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -39,8 +45,8 @@
         });
 
         async function fetchDropdownData() {
-            // Replace YOUR_INFO_API_ENDPOINT_HERE with your actual info API endpoint
-            const response = await fetch('http://127.0.0.1:5000/commits');
+
+            const response = await fetch('http://192.168.5.146:5000/commits');
             if (!response.ok) {
                 alert('Error fetching dropdown data');
                 return;
@@ -58,7 +64,7 @@
         }
 
         async function handleParse(inputData, data) {
-            const response = await fetch('http://127.0.0.1:5000/code', {
+            const response = await fetch('http://192.168.5.146:5000/code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,6 +114,11 @@
 
             extensionContainer.appendChild(reviewContainer);
 
+            if (resp.continuation_data != null) {
+                const separator = document.createElement('div');
+                separator.className = 'separator';
+                extensionContainer.appendChild(separator);
+        }
             return resp.continuation_data
         }
 
@@ -122,15 +133,22 @@
             const inputData = document.getElementById('input-question').value;
 
             async function recursiveHandleParse(data) {
+                console.info("一次循环调用")
                 const continue_data = await handleParse(inputData, data);
+                console.info(continue_data)
+                console.info("data:  "+data)
                 if (continue_data != null) {
+                    console.info("准备下一次调用")
                     await recursiveHandleParse(continue_data);
                 } else {
+                    console.info("最后一次调用")
+                    // Finalize the process
                     submitButton.removeChild(submitButton.firstChild); // Remove loader
                     submitButton.textContent = 'Submit';
                     submitButton.disabled = false;
                 }
             }
+
             const exStatus = document.getElementById('extension-status');
             exStatus.textContent = '代码分析中...';
             await recursiveHandleParse(null);
