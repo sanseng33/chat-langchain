@@ -143,10 +143,10 @@ def extract_relevant_logs(folder_path):
 
 
 
-    # keywords = ["[callGPT] gpt调用结果", "研究内容及目标"]
-    keywords = ["[callGPT] gpt调用结果", "innovation_point"]
+    keywords = ["[callGPT] gpt调用结果", "classification\":"]
+    # keywords = ["[callGPT] gpt调用结果", "innovation_point"]
     # keywords = ["[SituationModelWork] ai response"]
-    keywordsResp = ["[callGPT] 参数前置处理","project_submission"]
+    keywordsResp = ["[callGPT] 参数前置处理","project_roadmap"]
     results = []
     resultsResp = []
     # Walking through the folder
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     # resultResp2 = extract_info_from_resp("D://data//eureka-project-tar-rep.csv")
     # body = resultResp + resultResp2
 
-    results, body = extract_relevant_logs("D://data//log//")
+    results, body = extract_relevant_logs("D://doc//log//")
 
     corrid_to_prompt_con = {item['CORRID']: item['prompt_con'] for item in results}
     # print(corrid_to_prompt_con)
@@ -199,7 +199,7 @@ if __name__ == "__main__":
             # print(mergeditem)
             merged_list.append(mergeditem)
 
-    csv_file_name = 'D://data//keypatent.csv'
+    csv_file_name = 'D://data//技术路线-英文.csv'
     with open(csv_file_name, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=['prompt_con', 'resp'])
         writer.writeheader()
